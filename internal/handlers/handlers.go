@@ -3,16 +3,24 @@ package handlers
 import (
 	"io"
 	"net/http"
-	"strconv"
 	"strings"
 
 	"github.com/sirupsen/logrus"
 )
 
-type handler struct{}
+type service interface {
+	Shorten(url string) string
+	Expand(shortcut string) (string, error)
+}
 
-func New() *handler {
-	return &handler{}
+type handler struct {
+	service service
+}
+
+func New(service service) *handler {
+	return &handler{
+		service: service,
+	}
 }
 
 func (h *handler) Handle(w http.ResponseWriter, r *http.Request) {
@@ -29,20 +37,18 @@ func (h *handler) Handle(w http.ResponseWriter, r *http.Request) {
 // Эндпоинт POST / принимает в теле запроса строку URL для сокращения и возвращает ответ с кодом 201
 // и сокращённым URL в виде текстовой строки в теле.
 func (h *handler) shorten(w http.ResponseWriter, r *http.Request) {
-
 	b, err := io.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 	}
 
-	// TODO: Сократить ссылку
-	url := string(b)
+	shortcut := h.service.Shorten(string(b))
 
 	w.Header().Set("content-type", "text/plain")
 	w.WriteHeader(http.StatusCreated)
-	_, err = w.Write([]byte(url))
+	_, err = w.Write([]byte(shortcut))
 	if err != nil {
-		logrus.WithError(err).WithField("url", url).Error("write response error")
+		logrus.WithError(err).WithField("shortcut", shortcut).Error("write response error")
 		return
 	}
 }
@@ -52,20 +58,22 @@ func (h *handler) shorten(w http.ResponseWriter, r *http.Request) {
 func (h *handler) expand(w http.ResponseWriter, r *http.Request) {
 	p := strings.Split(r.URL.Path, "/")
 	if len(p) < 2 {
-		http.Error(w, "id parameter is missing", http.StatusBadRequest)
+		http.Error(w, "shortcut parameter is missing", http.StatusBadRequest)
 		return
 	}
 
-	id, err := strconv.Atoi(p[1])
+	shortcut := strings.TrimSpace(p[1])
+	if shortcut == "" {
+		http.Error(w, "shortcut parameter is empty", http.StatusBadRequest)
+		return
+	}
+
+	url, err := h.service.Expand(shortcut)
 	if err != nil {
-		http.Error(w, "id parameter is not valid", http.StatusBadRequest)
+		http.Error(w, "url not found", http.StatusNoContent)
 		return
 	}
-	logrus.Println("URL ID", id)
 
-	// TODO: Получить ссылку
-	location := "https://avito.ru"
-
-	w.Header().Set("Location", location)
+	w.Header().Set("Location", url)
 	w.WriteHeader(http.StatusTemporaryRedirect)
 }

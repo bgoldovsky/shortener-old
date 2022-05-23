@@ -5,29 +5,26 @@ import (
 
 	"github.com/sirupsen/logrus"
 
+	urlsRepo "github.com/bgoldovsky/shortener/internal/app/repo/urls"
+	urlsSrv "github.com/bgoldovsky/shortener/internal/app/services/urls"
 	"github.com/bgoldovsky/shortener/internal/config"
 	"github.com/bgoldovsky/shortener/internal/handlers"
 	"github.com/bgoldovsky/shortener/internal/middlewares"
 )
 
 func main() {
-	// Создаем обработчик
-	handler := conveyor(http.HandlerFunc(handlers.New().Handle), middlewares.LogMiddleware, middlewares.PanicMiddleware)
+	// Repositories
+	repo := urlsRepo.NewRepo()
+
+	// Services
+	service := urlsSrv.NewService(repo)
+
+	// Handlers
+	handler := middlewares.Conveyor(http.HandlerFunc(handlers.New(service).Handle), middlewares.Log, middlewares.Panic)
 	http.Handle("/", handler)
 
-	// Получаем адрес порта
+	// Start service
 	port := config.GetPort()
-
-	// Запускаем сервер
 	logrus.WithField("port", port).Info("server starts")
 	logrus.Fatal(http.ListenAndServe(port, nil))
-}
-
-type middleware func(http.Handler) http.Handler
-
-func conveyor(h http.Handler, middlewares ...middleware) http.Handler {
-	for _, mw := range middlewares {
-		h = mw(h)
-	}
-	return h
 }
