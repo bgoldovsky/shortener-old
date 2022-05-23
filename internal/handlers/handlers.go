@@ -1,22 +1,13 @@
 package handlers
 
 import (
-	"encoding/json"
-	"fmt"
+	"io"
 	"net/http"
 	"strconv"
 	"strings"
 
 	"github.com/sirupsen/logrus"
 )
-
-type shortURLFormModel struct {
-	Url string `json:"url"`
-}
-
-type shortURLViewModel struct {
-	Url string `json:"url"`
-}
 
 type handler struct{}
 
@@ -38,37 +29,20 @@ func (h *handler) Handle(w http.ResponseWriter, r *http.Request) {
 // Эндпоинт POST / принимает в теле запроса строку URL для сокращения и возвращает ответ с кодом 201
 // и сокращённым URL в виде текстовой строки в теле.
 func (h *handler) shorten(w http.ResponseWriter, r *http.Request) {
-	var model shortURLFormModel
-	err := json.NewDecoder(r.Body).Decode(&model)
+
+	b, err := io.ReadAll(r.Body)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	/*
-		if model.Url == "" {
-			http.Error(w, "url parameter is missing", http.StatusBadRequest)
-			return
-		}
-	*/
-
-	// TODO: Сократить ссылку и упаковать в модель
-	vm := shortURLViewModel{
-		Url: "https://yandex.ru",
-	}
-
-	w.Header().Set("content-type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	resp, err := json.Marshal(vm)
-	if err != nil {
-		logrus.WithError(err).WithField("vm", vm).Error("marshal response error")
 		http.Error(w, err.Error(), 500)
-		return
 	}
 
-	_, err = w.Write(resp)
+	// TODO: Сократить ссылку
+	url := string(b)
+
+	w.Header().Set("content-type", "text/plain")
+	w.WriteHeader(http.StatusCreated)
+	_, err = w.Write([]byte(url))
 	if err != nil {
-		logrus.WithError(err).Error("write response error")
+		logrus.WithError(err).WithField("url", url).Error("write response error")
 		return
 	}
 }
@@ -90,9 +64,8 @@ func (h *handler) expand(w http.ResponseWriter, r *http.Request) {
 	logrus.Println("URL ID", id)
 
 	// TODO: Получить ссылку
-	location := fmt.Sprintf("https://avito.ru")
+	location := "https://avito.ru"
 
-	w.Header().Set("content-type", "application/json")
 	w.Header().Set("Location", location)
 	w.WriteHeader(http.StatusTemporaryRedirect)
 }
