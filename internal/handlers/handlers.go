@@ -27,9 +27,9 @@ func New() *handler {
 func (h *handler) Handle(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPost:
-		h.shortURL(w, r)
+		h.shorten(w, r)
 	case http.MethodGet:
-		h.getURL(w, r)
+		h.expand(w, r)
 	default:
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 	}
@@ -37,7 +37,7 @@ func (h *handler) Handle(w http.ResponseWriter, r *http.Request) {
 
 // Эндпоинт POST / принимает в теле запроса строку URL для сокращения и возвращает ответ с кодом 201
 // и сокращённым URL в виде текстовой строки в теле.
-func (h *handler) shortURL(w http.ResponseWriter, r *http.Request) {
+func (h *handler) shorten(w http.ResponseWriter, r *http.Request) {
 	var model shortURLFormModel
 	err := json.NewDecoder(r.Body).Decode(&model)
 	if err != nil {
@@ -45,10 +45,12 @@ func (h *handler) shortURL(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if model.Url == "" {
-		http.Error(w, "url parameter is missing", http.StatusBadRequest)
-		return
-	}
+	/*
+		if model.Url == "" {
+			http.Error(w, "url parameter is missing", http.StatusBadRequest)
+			return
+		}
+	*/
 
 	// TODO: Сократить ссылку и упаковать в модель
 	vm := shortURLViewModel{
@@ -73,7 +75,7 @@ func (h *handler) shortURL(w http.ResponseWriter, r *http.Request) {
 
 // Эндпоинт GET /{id} принимает в качестве URL-параметра идентификатор сокращённого URL
 // и возвращает ответ с кодом 307 и оригинальным URL в HTTP-заголовке Location.
-func (h *handler) getURL(w http.ResponseWriter, r *http.Request) {
+func (h *handler) expand(w http.ResponseWriter, r *http.Request) {
 	p := strings.Split(r.URL.Path, "/")
 	if len(p) < 2 {
 		http.Error(w, "id parameter is missing", http.StatusBadRequest)
