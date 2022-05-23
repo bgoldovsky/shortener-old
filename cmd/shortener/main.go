@@ -11,9 +11,16 @@ import (
 )
 
 func main() {
+	// Создаем обработчик
 	handler := conveyor(http.HandlerFunc(handlers.New().Handle), middlewares.LogMiddleware, middlewares.PanicMiddleware)
 	http.Handle("/", handler)
-	logrus.Fatal(http.ListenAndServe(config.GetPort(), nil))
+
+	// Получаем адрес порта
+	port := config.GetPort()
+
+	// Запускаем сервер
+	logrus.WithField("port", port).Info("server starts")
+	logrus.Fatal(http.ListenAndServe(port, nil))
 }
 
 type middleware func(http.Handler) http.Handler
