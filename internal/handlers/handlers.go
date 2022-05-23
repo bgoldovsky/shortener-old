@@ -59,14 +59,6 @@ func (h *handler) expand(w http.ResponseWriter, r *http.Request) {
 	index := strings.Index(r.URL.Path, "/")
 	shortcut := strings.TrimSpace(r.URL.Path[index+1:])
 
-	/*
-		p := strings.Split(r.URL.Path, "/")
-		if len(p) < 2 {
-			http.Error(w, "shortcut parameter is missing", http.StatusBadRequest)
-			return
-		}
-		shortcut := strings.TrimSpace(p[1])
-	*/
 	if shortcut == "" {
 		http.Error(w, "shortcut parameter is empty", http.StatusBadRequest)
 		return
