@@ -56,13 +56,17 @@ func (h *handler) shorten(w http.ResponseWriter, r *http.Request) {
 // Эндпоинт GET /{id} принимает в качестве URL-параметра идентификатор сокращённого URL
 // и возвращает ответ с кодом 307 и оригинальным URL в HTTP-заголовке Location.
 func (h *handler) expand(w http.ResponseWriter, r *http.Request) {
-	p := strings.Split(r.URL.Path, "/")
-	if len(p) < 2 {
-		http.Error(w, "shortcut parameter is missing", http.StatusBadRequest)
-		return
-	}
+	index := strings.Index(r.URL.Path, "/")
+	shortcut := strings.TrimSpace(r.URL.Path[index+1:])
 
-	shortcut := strings.TrimSpace(p[1])
+	/*
+		p := strings.Split(r.URL.Path, "/")
+		if len(p) < 2 {
+			http.Error(w, "shortcut parameter is missing", http.StatusBadRequest)
+			return
+		}
+		shortcut := strings.TrimSpace(p[1])
+	*/
 	if shortcut == "" {
 		http.Error(w, "shortcut parameter is empty", http.StatusBadRequest)
 		return
