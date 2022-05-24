@@ -7,15 +7,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type middleware func(http.Handler) http.Handler
-
-func Conveyor(h http.Handler, middlewares ...middleware) http.Handler {
-	for _, mw := range middlewares {
-		h = mw(h)
-	}
-	return h
-}
-
 func Recovering(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer func() {

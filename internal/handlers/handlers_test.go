@@ -60,7 +60,7 @@ func TestShortenHandler(t *testing.T) {
 			request := httptest.NewRequest(http.MethodPost, tt.request, buffer)
 
 			w := httptest.NewRecorder()
-			h := http.HandlerFunc(httpHandler.shorten)
+			h := http.HandlerFunc(httpHandler.Shorten)
 			h.ServeHTTP(w, request)
 			result := w.Result()
 

@@ -17,12 +17,14 @@ type generator interface {
 type service struct {
 	repo      repo
 	generator generator
+	host      string
 }
 
-func NewService(repo repo, generator generator) *service {
+func NewService(repo repo, generator generator, host string) *service {
 	return &service{
 		repo:      repo,
 		generator: generator,
+		host:      host,
 	}
 }
 

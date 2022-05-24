@@ -1,20 +1,20 @@
 package generator
 
 import (
-	"fmt"
 	"math/rand"
 )
 
 const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-type generator struct{}
+type generator struct {
+}
 
 func NewGenerator() *generator {
 	return &generator{}
 }
 
 func (g *generator) Shortcut() string {
-	return fmt.Sprintf("%s.ets", generate(10))
+	return generate(10)
 }
 
 func generate(n int) string {

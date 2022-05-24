@@ -10,3 +10,12 @@ func GetPort() string {
 
 	return ":" + p
 }
+
+func GetShortcutHost() string {
+	h := os.Getenv("SHORTCUT_HOST")
+	if h == "" {
+		h = "http://localhost:8080"
+	}
+
+	return h
+}

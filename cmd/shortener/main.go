@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 
+	"github.com/go-chi/chi"
 	"github.com/sirupsen/logrus"
 
 	"github.com/bgoldovsky/shortener/internal/app/generator"
@@ -19,18 +20,17 @@ func main() {
 
 	// Services
 	gen := generator.NewGenerator()
-	service := urlsSrv.NewService(repo, gen)
+	service := urlsSrv.NewService(repo, gen, config.GetShortcutHost())
 
-	// Handlers
-	handler := middlewares.Conveyor(
-		http.HandlerFunc(handlers.New(service).Handle),
-		middlewares.Logging,
-		middlewares.Recovering,
-	)
-	http.Handle("/", handler)
+	// Router
+	r := chi.NewRouter()
+	r.Use(middlewares.Logging)
+	r.Use(middlewares.Recovering)
+	r.Post("/", http.HandlerFunc(handlers.New(service).Shorten))
+	r.Get("/{shortcut}", http.HandlerFunc(handlers.New(service).Expand))
 
 	// Start service
 	port := config.GetPort()
 	logrus.WithField("port", port).Info("server starts")
-	logrus.Fatal(http.ListenAndServe(port, nil))
+	logrus.Fatal(http.ListenAndServe(port, r))
 }
