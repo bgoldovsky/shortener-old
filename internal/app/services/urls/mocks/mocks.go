@@ -83,16 +83,16 @@ func (m *Mockgenerator) EXPECT() *MockgeneratorMockRecorder {
 	return m.recorder
 }
 
-// Shortcut mocks base method.
-func (m *Mockgenerator) Shortcut() string {
+// ID mocks base method.
+func (m *Mockgenerator) ID() string {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Shortcut")
+	ret := m.ctrl.Call(m, "ID")
 	ret0, _ := ret[0].(string)
 	return ret0
 }
 
-// Shortcut indicates an expected call of Shortcut.
-func (mr *MockgeneratorMockRecorder) Shortcut() *gomock.Call {
+// ID indicates an expected call of ID.
+func (mr *MockgeneratorMockRecorder) ID() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Shortcut", reflect.TypeOf((*Mockgenerator)(nil).Shortcut))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ID", reflect.TypeOf((*Mockgenerator)(nil).ID))
 }

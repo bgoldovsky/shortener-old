@@ -7,6 +7,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// Recovering Восстанавливает работу сервера после паники
 func Recovering(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
@@ -26,6 +27,7 @@ func Recovering(next http.Handler) http.Handler {
 	})
 }
 
+// Logging Логирует детали запроса
 func Logging(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		logrus.WithField("method", r.Method).

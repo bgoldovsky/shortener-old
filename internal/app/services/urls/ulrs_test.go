@@ -14,16 +14,16 @@ const host = "http://localhost:8080"
 
 func TestShorten(t *testing.T) {
 	tests := []struct {
-		name        string
-		shortcut    string
-		shortcutURL string
-		url         string
+		name     string
+		id       string
+		shortcut string
+		url      string
 	}{
 		{
-			name:        "success",
-			shortcut:    "qwerty",
-			shortcutURL: "http://localhost:8080/qwerty",
-			url:         "avito.ru",
+			name:     "success",
+			id:       "qwerty",
+			shortcut: "http://localhost:8080/qwerty",
+			url:      "avito.ru",
 		},
 	}
 
@@ -32,15 +32,15 @@ func TestShorten(t *testing.T) {
 
 	for _, tt := range tests {
 		genMock := mockUrls.NewMockgenerator(ctrl)
-		genMock.EXPECT().Shortcut().Return(tt.shortcut)
+		genMock.EXPECT().ID().Return(tt.id)
 
 		repoMock := mockUrls.NewMockrepo(ctrl)
-		repoMock.EXPECT().Add(tt.shortcut, tt.url)
+		repoMock.EXPECT().Add(tt.id, tt.url)
 
 		s := NewService(repoMock, genMock, host)
 		act := s.Shorten(tt.url)
 
-		assert.Equal(t, tt.shortcutURL, act)
+		assert.Equal(t, tt.shortcut, act)
 	}
 }
 

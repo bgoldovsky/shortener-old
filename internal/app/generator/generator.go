@@ -13,7 +13,8 @@ func NewGenerator() *generator {
 	return &generator{}
 }
 
-func (g *generator) Shortcut() string {
+// ID Генерирует десятизначный строковый ID
+func (g *generator) ID() string {
 	return generate(10)
 }
 

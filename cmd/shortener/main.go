@@ -20,17 +20,17 @@ func main() {
 
 	// Services
 	gen := generator.NewGenerator()
-	service := urlsSrv.NewService(repo, gen, config.GetShortcutHost())
+	service := urlsSrv.NewService(repo, gen, config.ShortcutHost())
 
 	// Router
 	r := chi.NewRouter()
 	r.Use(middlewares.Logging)
 	r.Use(middlewares.Recovering)
-	r.Post("/", http.HandlerFunc(handlers.New(service).Shorten))
-	r.Get("/{shortcut}", http.HandlerFunc(handlers.New(service).Expand))
+	r.Post("/", handlers.New(service).Shorten)
+	r.Get("/{id}", handlers.New(service).Expand)
 
 	// Start service
-	port := config.GetPort()
+	port := config.Port()
 	logrus.WithField("port", port).Info("server starts")
 	logrus.Fatal(http.ListenAndServe(port, r))
 }

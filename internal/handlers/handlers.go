@@ -10,7 +10,7 @@ import (
 
 type service interface {
 	Shorten(url string) string
-	Expand(shortcut string) (string, error)
+	Expand(id string) (string, error)
 }
 
 type handler struct {
@@ -23,20 +23,12 @@ func New(service service) *handler {
 	}
 }
 
-func (h *handler) Handle(w http.ResponseWriter, r *http.Request) {
-	switch r.Method {
-	case http.MethodPost:
-		h.Shorten(w, r)
-	case http.MethodGet:
-		h.Expand(w, r)
-	default:
+// Shorten Сокращает URL
+func (h *handler) Shorten(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 	}
-}
 
-// Эндпоинт POST / принимает в теле запроса строку URL для сокращения и возвращает ответ с кодом 201
-// и сокращённым URL в виде текстовой строки в теле.
-func (h *handler) Shorten(w http.ResponseWriter, r *http.Request) {
 	b, err := io.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
@@ -53,16 +45,19 @@ func (h *handler) Shorten(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Эндпоинт GET /{id} принимает в качестве URL-параметра идентификатор сокращённого URL
-// и возвращает ответ с кодом 307 и оригинальным URL в HTTP-заголовке Location.
+// Expand Возвращает полный URL по идентификатору сокращенного
 func (h *handler) Expand(w http.ResponseWriter, r *http.Request) {
-	shortcut := chi.URLParam(r, "shortcut")
-	if shortcut == "" {
-		http.Error(w, "shortcut parameter is empty", http.StatusBadRequest)
+	if r.Method != http.MethodGet {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+	}
+
+	id := chi.URLParam(r, "id")
+	if id == "" {
+		http.Error(w, "id parameter is empty", http.StatusBadRequest)
 		return
 	}
 
-	url, err := h.service.Expand(shortcut)
+	url, err := h.service.Expand(id)
 	if err != nil {
 		http.Error(w, "url not found", http.StatusNoContent)
 		return

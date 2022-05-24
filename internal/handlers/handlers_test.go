@@ -24,16 +24,16 @@ func TestShortenHandler(t *testing.T) {
 		shortcut    string
 	}
 	tests := []struct {
-		name     string
-		request  string
-		url      string
-		shortcut string
-		want     want
+		name    string
+		request string
+		url     string
+		id      string
+		want    want
 	}{
 		{
-			name:     "success",
-			url:      "https://avito.ru",
-			shortcut: "xyz",
+			name: "success",
+			url:  "https://avito.ru",
+			id:   "xyz",
 			want: want{
 				contentType: "text/plain; charset=utf-8",
 				statusCode:  201,
@@ -48,10 +48,10 @@ func TestShortenHandler(t *testing.T) {
 			defer ctrl.Finish()
 
 			genMock := mockUrls.NewMockgenerator(ctrl)
-			genMock.EXPECT().Shortcut().Return(tt.shortcut)
+			genMock.EXPECT().ID().Return(tt.id)
 
 			repoMock := mockUrls.NewMockrepo(ctrl)
-			repoMock.EXPECT().Add(tt.shortcut, tt.url)
+			repoMock.EXPECT().Add(tt.id, tt.url)
 
 			srv := urls.NewService(repoMock, genMock, host)
 

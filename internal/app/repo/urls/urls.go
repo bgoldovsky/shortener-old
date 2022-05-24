@@ -16,6 +16,7 @@ func NewRepo() *repo {
 	}
 }
 
+// Add Сохраняет URL
 func (r *repo) Add(id, url string) {
 	r.ma.Lock()
 	defer r.ma.Unlock()
@@ -23,6 +24,7 @@ func (r *repo) Add(id, url string) {
 	r.store[id] = url
 }
 
+// Get Возвращает URL
 func (r *repo) Get(id string) (string, error) {
 	r.ma.RLock()
 	defer r.ma.RUnlock()

@@ -13,7 +13,7 @@ type repo interface {
 }
 
 type generator interface {
-	Shortcut() string
+	ID() string
 }
 
 type service struct {
@@ -30,17 +30,19 @@ func NewService(repo repo, generator generator, host string) *service {
 	}
 }
 
+// Shorten Сокращает URL
 func (s *service) Shorten(url string) string {
-	shortcut := s.generator.Shortcut()
-	s.repo.Add(shortcut, url)
+	id := s.generator.ID()
+	s.repo.Add(id, url)
 
-	return fmt.Sprintf("%s/%s", s.host, shortcut)
+	return fmt.Sprintf("%s/%s", s.host, id)
 }
 
-func (s *service) Expand(shortcut string) (string, error) {
-	url, err := s.repo.Get(shortcut)
+// Expand Возвращает полный URL по идентификатору сокращенного
+func (s *service) Expand(id string) (string, error) {
+	url, err := s.repo.Get(id)
 	if err != nil {
-		logrus.WithError(err).WithField("shortcut", shortcut).Error("get url error")
+		logrus.WithError(err).WithField("id", id).Error("get url error")
 		return "", err
 	}
 
