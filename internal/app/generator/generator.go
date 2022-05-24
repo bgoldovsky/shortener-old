@@ -1,7 +1,6 @@
 package generator
 
 import (
-	"fmt"
 	"math/rand"
 )
 
@@ -14,7 +13,8 @@ func NewGenerator() *generator {
 }
 
 func (g *generator) Shortcut() string {
-	return fmt.Sprintf("%s.ets", generate(10))
+	return generate(5)
+	//return fmt.Sprintf("%s.ets", generate(10))
 }
 
 func generate(n int) string {
