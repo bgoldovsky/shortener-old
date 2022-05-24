@@ -5,6 +5,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 
+	"github.com/bgoldovsky/shortener/internal/app/generator"
 	urlsRepo "github.com/bgoldovsky/shortener/internal/app/repo/urls"
 	urlsSrv "github.com/bgoldovsky/shortener/internal/app/services/urls"
 	"github.com/bgoldovsky/shortener/internal/config"
@@ -17,7 +18,8 @@ func main() {
 	repo := urlsRepo.NewRepo()
 
 	// Services
-	service := urlsSrv.NewService(repo)
+	gen := generator.NewGenerator()
+	service := urlsSrv.NewService(repo, gen)
 
 	// Handlers
 	handler := middlewares.Conveyor(

@@ -1,31 +1,33 @@
+//go:generate mockgen -source=urls.go -destination=mocks/mocks.go
 package urls
 
 import (
-	"fmt"
-	"math/rand"
-
 	"github.com/sirupsen/logrus"
 )
-
-const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 type repo interface {
 	Add(id, url string)
 	Get(id string) (string, error)
 }
 
-type service struct {
-	repo repo
+type generator interface {
+	Shortcut() string
 }
 
-func NewService(repo repo) *service {
+type service struct {
+	repo      repo
+	generator generator
+}
+
+func NewService(repo repo, generator generator) *service {
 	return &service{
-		repo: repo,
+		repo:      repo,
+		generator: generator,
 	}
 }
 
 func (s *service) Shorten(url string) string {
-	shortcut := generateURL()
+	shortcut := s.generator.Shortcut()
 	s.repo.Add(shortcut, url)
 
 	return shortcut
@@ -39,16 +41,4 @@ func (s *service) Expand(shortcut string) (string, error) {
 	}
 
 	return url, nil
-}
-
-func generateURL() string {
-	return fmt.Sprintf("%s.ets", generate(10))
-}
-
-func generate(n int) string {
-	b := make([]byte, n)
-	for i := range b {
-		b[i] = letterBytes[rand.Int63()%int64(len(letterBytes))]
-	}
-	return string(b)
 }
