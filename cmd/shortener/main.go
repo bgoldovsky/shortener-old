@@ -3,7 +3,7 @@ package main
 import (
 	"net/http"
 
-	"github.com/go-chi/chi"
+	chi "github.com/go-chi/chi/v5"
 	"github.com/sirupsen/logrus"
 
 	"github.com/bgoldovsky/shortener/internal/app/generator"

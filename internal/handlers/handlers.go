@@ -44,7 +44,7 @@ func (h *handler) Shorten(w http.ResponseWriter, r *http.Request) {
 
 	shortcut := h.service.Shorten(string(b))
 
-	w.Header().Set("content-type", "text/plain")
+	w.Header().Set("content-type", "text/plain; charset=utf-8")
 	w.WriteHeader(http.StatusCreated)
 	_, err = w.Write([]byte(shortcut))
 	if err != nil {

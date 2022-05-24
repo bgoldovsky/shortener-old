@@ -15,6 +15,8 @@ import (
 	mockUrls "github.com/bgoldovsky/shortener/internal/app/services/urls/mocks"
 )
 
+const host = "http://localhost:8080"
+
 func TestShortenHandler(t *testing.T) {
 	type want struct {
 		contentType string
@@ -31,11 +33,11 @@ func TestShortenHandler(t *testing.T) {
 		{
 			name:     "success",
 			url:      "https://avito.ru",
-			shortcut: "xyz.ets",
+			shortcut: "xyz",
 			want: want{
-				contentType: "text/plain",
+				contentType: "text/plain; charset=utf-8",
 				statusCode:  201,
-				shortcut:    "xyz.ets",
+				shortcut:    "http://localhost:8080/xyz",
 			},
 			request: "/",
 		},
@@ -51,7 +53,7 @@ func TestShortenHandler(t *testing.T) {
 			repoMock := mockUrls.NewMockrepo(ctrl)
 			repoMock.EXPECT().Add(tt.shortcut, tt.url)
 
-			srv := urls.NewService(repoMock, genMock)
+			srv := urls.NewService(repoMock, genMock, host)
 
 			httpHandler := New(srv)
 

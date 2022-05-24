@@ -10,16 +10,20 @@ import (
 	mockUrls "github.com/bgoldovsky/shortener/internal/app/services/urls/mocks"
 )
 
+const host = "http://localhost:8080"
+
 func TestShorten(t *testing.T) {
 	tests := []struct {
-		name     string
-		shortcut string
-		url      string
+		name        string
+		shortcut    string
+		shortcutURL string
+		url         string
 	}{
 		{
-			name:     "success",
-			shortcut: "qwerty.ets",
-			url:      "avito.ru",
+			name:        "success",
+			shortcut:    "qwerty",
+			shortcutURL: "http://localhost:8080/qwerty",
+			url:         "avito.ru",
 		},
 	}
 
@@ -33,10 +37,10 @@ func TestShorten(t *testing.T) {
 		repoMock := mockUrls.NewMockrepo(ctrl)
 		repoMock.EXPECT().Add(tt.shortcut, tt.url)
 
-		s := NewService(repoMock, genMock)
+		s := NewService(repoMock, genMock, host)
 		act := s.Shorten(tt.url)
 
-		assert.Equal(t, tt.shortcut, act)
+		assert.Equal(t, tt.shortcutURL, act)
 	}
 }
 
@@ -49,13 +53,13 @@ func TestExpand(t *testing.T) {
 	}{
 		{
 			name:     "success",
-			shortcut: "qwerty.ets",
+			shortcut: "qwerty",
 			url:      "avito.ru",
 			err:      nil,
 		},
 		{
 			name:     "repo err",
-			shortcut: "qwerty.ets",
+			shortcut: "qwerty",
 			url:      "",
 			err:      errors.New("test err"),
 		},
@@ -68,7 +72,7 @@ func TestExpand(t *testing.T) {
 		repoMock := mockUrls.NewMockrepo(ctrl)
 		repoMock.EXPECT().Get(tt.shortcut).Return(tt.url, tt.err)
 
-		s := NewService(repoMock, nil)
+		s := NewService(repoMock, nil, host)
 		act, err := s.Expand(tt.shortcut)
 
 		assert.Equal(t, tt.err, err)

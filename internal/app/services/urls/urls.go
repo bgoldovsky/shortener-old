@@ -2,6 +2,8 @@
 package urls
 
 import (
+	"fmt"
+
 	"github.com/sirupsen/logrus"
 )
 
@@ -32,7 +34,7 @@ func (s *service) Shorten(url string) string {
 	shortcut := s.generator.Shortcut()
 	s.repo.Add(shortcut, url)
 
-	return shortcut
+	return fmt.Sprintf("%s/%s", s.host, shortcut)
 }
 
 func (s *service) Expand(shortcut string) (string, error) {
