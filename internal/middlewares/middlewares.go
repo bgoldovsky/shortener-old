@@ -16,7 +16,7 @@ func Conveyor(h http.Handler, middlewares ...middleware) http.Handler {
 	return h
 }
 
-func Panic(next http.Handler) http.Handler {
+func Recovering(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			if a := recover(); a != nil {
@@ -35,7 +35,7 @@ func Panic(next http.Handler) http.Handler {
 	})
 }
 
-func Log(next http.Handler) http.Handler {
+func Logging(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		logrus.WithField("method", r.Method).
 			WithField("path", r.URL.Path).

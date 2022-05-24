@@ -20,7 +20,11 @@ func main() {
 	service := urlsSrv.NewService(repo)
 
 	// Handlers
-	handler := middlewares.Conveyor(http.HandlerFunc(handlers.New(service).Handle), middlewares.Log, middlewares.Panic)
+	handler := middlewares.Conveyor(
+		http.HandlerFunc(handlers.New(service).Handle),
+		middlewares.Logging,
+		middlewares.Recovering,
+	)
 	http.Handle("/", handler)
 
 	// Start service
